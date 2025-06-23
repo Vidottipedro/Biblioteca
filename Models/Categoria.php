@@ -1,14 +1,48 @@
 <?php
 
-namespace Models;
+namespace App\Model;
 
-use Illuminate\Database\Eloquent\Model;
+use App\DAO\CategoriaDAO;
+use Exception;
 
-class Categoria extends Models
+final class Categoria extends Model
 {
-    protected $table = 'categorias';
+    public ?int $Id = null;
 
-    protected $fillable = [
-        'descricao',
-    ];
+    public ?string $Descricao
+    {
+        set
+        {
+            if(strlen($value) < 3)
+                throw new Exception("Descricao deve ter no mínimo 3 caracteres.");
+
+            $this->Descricao = $value;
+        }
+
+        get => $this->Descricao ?? null;
+    }
+
+
+    function save() : Categoria
+    {
+        return new CategoriaDAO()->save($this);
+    }
+
+    function getById(int $id) : ?Categoria
+    {
+        return new CategoriaDAO()->selectById($id);
+    }
+
+    function getAllRows() : array
+    {
+        $this->rows = new CategoriaDAO()->select();
+
+        return $this->rows;
+    }
+
+
+    function delete(int $id) : bool
+    {
+        return new CategoriaDAO()->delete($id);
+    }
 }
